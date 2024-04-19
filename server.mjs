@@ -1,5 +1,8 @@
-import { express } from 'express'
+import express from 'express'
 import morgan from 'morgan'
+import { config } from 'dotenv'
+
+config()
 
 const app = express()
 
@@ -24,12 +27,12 @@ async function handle_signal(signal) {
 process.on('SIGINT', handle_signal)
 process.on('SIGTERM', handle_signal)
 
-app.get('/ping', async (_, res) => {
+app.get('/ping', async (req, res) => {
   res.send('pong')
 })
 
-app.get('/standby', async (_, res) => {
-  
+app.get('/standby', async (req, res) => {
+
 })
 
 app.listen(PORT, () => {
