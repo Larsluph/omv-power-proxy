@@ -1,0 +1,13 @@
+services:
+  app:
+    image: ghcr.io/larsluph/omv-power-proxy:latest
+    container_name: omv-power-proxy
+    restart: unless-stopped
+    ports:
+      - "61235:3000"
+    environment:
+      - OMV_BASE_URL=${OMV_BASE_URL}
+      - OMV_USERNAME=${OMV_USERNAME}
+      - OMV_PASSWORD=${OMV_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

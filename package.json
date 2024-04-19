@@ -1,5 +1,5 @@
 {
-  "name": "rpc-power-proxy",
+  "name": "omv-power-proxy",
   "version": "0.0.0",
   "private": true,
   "scripts": {
