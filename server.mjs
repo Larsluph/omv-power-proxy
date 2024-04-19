@@ -1,10 +1,26 @@
 import express from 'express'
 import morgan from 'morgan'
 import { config } from 'dotenv'
+import { standby, shutdown } from './net.mjs'
 
 config()
 
 const app = express()
+
+;(function require_env() {
+  const required = [
+    'OMV_BASE_URL',
+    'OMV_USERNAME',
+    'OMV_PASSWORD'
+  ]
+
+  required.forEach((key) => {
+    if (!process.env[key]) {
+      console.error(`Missing required environment variable: ${key}`)
+      process.exit(1)
+    }
+  })
+})()
 
 const PORT = process.env.PORT || 3000
 
@@ -32,7 +48,23 @@ app.get('/ping', async (req, res) => {
 })
 
 app.get('/standby', async (req, res) => {
+  try {
+    await standby()
+    res.send('OK')
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error')
+  }
+})
 
+app.get('/shutdown', async (req, res) => {
+  try {
+    await shutdown()
+    res.send('OK')
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error')
+  }
 })
 
 app.listen(PORT, () => {
