@@ -27,7 +27,7 @@ export async function standby() {
   await client.post('/rpc.php', {
     service: 'System',
     method: 'standby',
-    params: { delay: 500 },
+    params: { delay: 1 },
     options: null
   })
 }
@@ -38,7 +38,7 @@ export async function shutdown() {
   await client.post('/rpc.php', {
     service: 'System',
     method: 'shutdown',
-    params: { delay: 500 },
+    params: { delay: 1 },
     options: null
   })
 }
