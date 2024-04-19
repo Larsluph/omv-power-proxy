@@ -11,7 +11,6 @@ export async function login() {
 
   const { OMV_USERNAME, OMV_PASSWORD } = process.env
 
-  // send login request
   await client.post("/rpc.php", {
     service: "Session",
     method: "login",
@@ -28,7 +27,7 @@ export async function standby() {
   await client.post('/rpc.php', {
     service: 'System',
     method: 'standby',
-    params: { delay: 0 },
+    params: { delay: 500 },
     options: null
   })
 }
@@ -39,7 +38,7 @@ export async function shutdown() {
   await client.post('/rpc.php', {
     service: 'System',
     method: 'shutdown',
-    params: { delay: 0 },
+    params: { delay: 500 },
     options: null
   })
 }

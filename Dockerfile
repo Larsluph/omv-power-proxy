@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY . .
+COPY src/ .
 
 EXPOSE 3000
 CMD [ "node", "server.mjs" ]
