@@ -1,9 +1,8 @@
+import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
-import { config } from 'dotenv'
+import { disablePowerControl, enablePowerControl, isPowerControlDisabled } from './flags.mjs'
 import { shutdown, standby } from './net.mjs'
-import { disablePowerControl, enablePowerControl, isPowerControlDisabled } from "./flags.mjs";
-import { AxiosError } from "axios";
 
 config()
 
@@ -26,16 +25,14 @@ const app = express()
 
 const PORT = process.env.PORT || 3000
 
-app.use(morgan('dev'));
+app.use(morgan('dev'))
 
 // error handler
+// noinspection JSUnusedLocalSymbols
 app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  res.status(err.status || 500);
-});
+  console.error(err.stack)
+  res.status(500).send('Something broke!')
+})
 
 async function handle_signal(signal) {
   console.log(`Received ${ signal }. Exiting...`)

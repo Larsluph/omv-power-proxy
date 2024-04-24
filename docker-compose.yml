@@ -4,7 +4,7 @@ services:
     container_name: omv-power-proxy
     restart: unless-stopped
     ports:
-      - "61235:3000"
+      - "${PORT}:3000"
     environment:
       - OMV_BASE_URL=${OMV_BASE_URL}
       - OMV_USERNAME=${OMV_USERNAME}
