@@ -1,7 +1,9 @@
 import express from 'express'
 import morgan from 'morgan'
 import { config } from 'dotenv'
-import { standby, shutdown } from './net.mjs'
+import { shutdown, standby } from './net.mjs'
+import { disablePowerControl, enablePowerControl, isPowerControlDisabled } from "./flags.mjs";
+import { AxiosError } from "axios";
 
 config()
 
@@ -16,7 +18,7 @@ const app = express()
 
   required.forEach((key) => {
     if (!process.env[key]) {
-      console.error(`Missing required environment variable: ${key}`)
+      console.error(`Missing required environment variable: ${ key }`)
       process.exit(1)
     }
   })
@@ -36,7 +38,7 @@ app.use((err, req, res, next) => {
 });
 
 async function handle_signal(signal) {
-  console.log(`Received ${signal}. Exiting...`)
+  console.log(`Received ${ signal }. Exiting...`)
   process.exit(0)
 }
 
@@ -48,25 +50,45 @@ app.get('/ping', async (req, res) => {
 })
 
 app.get('/standby', async (req, res) => {
+  if (isPowerControlDisabled()) {
+    res.status(403).send('Power control is disabled')
+    return
+  }
+
   try {
     await standby()
     res.send('OK')
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error')
+    res.status(500).send(JSON.stringify(err.cause))
   }
 })
 
 app.get('/shutdown', async (req, res) => {
+  if (isPowerControlDisabled()) {
+    res.status(403).send('Power control is disabled')
+    return
+  }
+
   try {
     await shutdown()
     res.send('OK')
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error')
+    res.status(500).send(JSON.stringify(err.cause))
   }
 })
 
+app.get('/power/enable', async (req, res) => {
+  enablePowerControl()
+  res.send('Power control enabled')
+})
+
+app.get('/power/disable', async (req, res) => {
+  disablePowerControl()
+  res.send('Power control disabled')
+})
+
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+  console.log(`Server is running on port ${ PORT }`)
 })
