@@ -1,5 +1,7 @@
 FROM node:21-alpine
 
+ENV DATA_PATH=/data
+
 # Create app directory
 WORKDIR /app
 

@@ -10,6 +10,7 @@ const app = express()
 
 ;(function require_env() {
   const required = [
+    'DATA_PATH',
     'OMV_BASE_URL',
     'OMV_USERNAME',
     'OMV_PASSWORD'

@@ -11,3 +11,5 @@ services:
       - OMV_PASSWORD=${OMV_PASSWORD}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./data:/data
