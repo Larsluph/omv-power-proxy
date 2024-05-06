@@ -26,7 +26,7 @@ const app = express()
 
 const PORT = process.env.PORT || 3000
 
-app.use(morgan('dev'))
+app.use(morgan(':remote-addr - [:date[clf]] ":method :url" :status :total-time ms :res[content-length]'))
 
 // error handler
 // noinspection JSUnusedLocalSymbols
