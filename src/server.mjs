@@ -1,6 +1,7 @@
 import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
+import { sendWebhook } from './discord.mjs'
 import { disablePowerControl, enablePowerControl, isPowerControlDisabled } from './flags.mjs'
 import { shutdown, standby } from './net.mjs'
 
@@ -50,6 +51,7 @@ app.get('/ping', async (req, res) => {
 app.get('/standby', async (req, res) => {
   if (isPowerControlDisabled()) {
     res.status(403).send('Power control is disabled')
+    await sendWebhook({ embeds: [{ title: "Sleep request received", color: 0xCBA20C, timestamp: new Date().toISOString() }] })
     return
   }
 
@@ -65,6 +67,7 @@ app.get('/standby', async (req, res) => {
 app.get('/shutdown', async (req, res) => {
   if (isPowerControlDisabled()) {
     res.status(403).send('Power control is disabled')
+    await sendWebhook({ embeds: [{ title: "Shut down request received", color: 0xBA0808, timestamp: new Date().toISOString() }] })
     return
   }
 
