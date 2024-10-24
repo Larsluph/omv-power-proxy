@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { wrapper } from 'axios-cookiejar-support'
 import { CookieJar } from 'tough-cookie'
+import wake from 'wakeonlan'
 
 function createClient() {
   return wrapper(axios.create({ baseURL: process.env.OMV_BASE_URL, jar: new CookieJar() }))
@@ -40,5 +41,14 @@ export async function shutdown() {
     method: 'shutdown',
     params: { delay: 1 },
     options: null
+  })
+}
+
+export async function poweron() {
+  const { WOL_MAC_ADDRESS, WOL_BROADCAST_ADDRESS } = process.env
+  if (!WOL_MAC_ADDRESS) return false
+
+  await wake(WOL_MAC_ADDRESS, {
+    address: WOL_BROADCAST_ADDRESS
   })
 }

@@ -9,6 +9,7 @@ services:
       - OMV_BASE_URL=${OMV_BASE_URL}
       - OMV_USERNAME=${OMV_USERNAME}
       - OMV_PASSWORD=${OMV_PASSWORD}
+      - WOL_MAC_ADDRESS=${WOL_MAC_ADDRESS}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

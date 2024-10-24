@@ -1,9 +1,8 @@
 import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
-import { sendWebhook } from './discord.mjs'
-import { disablePowerControl, enablePowerControl, isPowerControlDisabled } from './flags.mjs'
-import { shutdown, standby } from './net.mjs'
+import { checkPowerControl, disablePowerControl, enablePowerControl } from './flags.mjs'
+import { poweron, shutdown, standby } from './net.mjs'
 
 config()
 
@@ -44,40 +43,34 @@ async function handle_signal(signal) {
 process.on('SIGINT', handle_signal)
 process.on('SIGTERM', handle_signal)
 
+async function run_safe_proc(res, proc) {
+  try {
+    await proc()
+    res.send('OK')
+  } catch (err) {
+    console.error(err)
+    console.error(err.stack)
+    res.status(500).send(JSON.stringify(err.cause))
+  }
+}
+
 app.get('/ping', async (req, res) => {
   res.send('pong')
 })
 
-app.get('/standby', async (req, res) => {
-  if (isPowerControlDisabled()) {
-    res.status(403).send('Power control is disabled')
-    await sendWebhook({ embeds: [{ title: "Sleep request received", color: 0xCBA20C, timestamp: new Date().toISOString() }] })
-    return
-  }
+app.get('/poweron', async (req, res) => {
+  if (!await checkPowerControl(res, 'Power ON request received', 0x13B10B)) return
+  await run_safe_proc(res, async () => await poweron())
+})
 
-  try {
-    await standby()
-    res.send('OK')
-  } catch (err) {
-    console.error(err)
-    res.status(500).send(JSON.stringify(err.cause))
-  }
+app.get('/standby', async (req, res) => {
+  if (!await checkPowerControl(res, 'Sleep request received', 0xCBA20C)) return
+  await run_safe_proc(res, async () => await standby())
 })
 
 app.get('/shutdown', async (req, res) => {
-  if (isPowerControlDisabled()) {
-    res.status(403).send('Power control is disabled')
-    await sendWebhook({ embeds: [{ title: "Shut down request received", color: 0xBA0808, timestamp: new Date().toISOString() }] })
-    return
-  }
-
-  try {
-    await shutdown()
-    res.send('OK')
-  } catch (err) {
-    console.error(err)
-    res.status(500).send(JSON.stringify(err.cause))
-  }
+  if (!await checkPowerControl(res, 'Shut down request received', 0xBA0808)) return
+  await run_safe_proc(res, async () => await shutdown())
 })
 
 app.get('/power/enable', async (req, res) => {
