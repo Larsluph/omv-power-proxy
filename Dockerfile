@@ -12,4 +12,4 @@ RUN npm ci
 COPY src/ .
 
 EXPOSE 3000
-CMD [ "node", "server.mjs" ]
+CMD [ "node", "main.mjs" ]

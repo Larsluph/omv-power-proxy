@@ -1,9 +1,8 @@
 import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
-import { checkPowerControl, disablePowerControl, enablePowerControl } from './flags.mjs'
-import { acquireLock, releaseLock } from './locks.mjs'
-import { poweron, standby } from './power.mjs'
+import locksRouter from './routers/lockManagement.mjs'
+import powerControlRouter from './routers/powerControl.mjs'
 
 config()
 
@@ -41,44 +40,15 @@ app.get('/ping', async (req, res) => {
   res.send('pong')
 })
 
-app.get('/acquire', async (req, res) => {
-  if (!await checkPowerControl(res, 'Lock acquisition request received', 0x13B10B)) return
-
-  const acquired = await acquireLock('power', poweron)
-  if (!acquired) {
-    return res.status(409).send("You already acquired a lock for this resource")
-  }
-
-  return res.send('OK')
-})
-
-app.get('/release', async (req, res) => {
-  if (!await checkPowerControl(res, 'Lock release request received', 0xCBA20C)) return
-
-  const released = await releaseLock('power', standby)
-  if (!released) {
-    return res.status(409).send("You don't have any lock pending for this resource")
-  }
-
-  return res.send('OK')
-})
-
-app.get('/enable', async (req, res) => {
-  enablePowerControl()
-  res.send('Power control enabled')
-})
-
-app.get('/disable', async (req, res) => {
-  disablePowerControl()
-  res.send('Power control disabled')
-})
+app.use(locksRouter)
+app.use(powerControlRouter)
 
 // noinspection JSUnusedLocalSymbols
 /**
  * Global error handler middleware
  * @param err {Error} - The error that occurred
- * @param req {express.Request} - The request object
- * @param res {express.Response} - The response object
+ * @param req {import('express').Request} - The request object
+ * @param res {import('express').Response} - The response object
  * @param next {Function} - The next middleware function
  */
 function errorHandler(err, req, res, next) {

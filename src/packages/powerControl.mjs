@@ -1,10 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import { genPayload, sendWebhook } from "./discord.mjs";
+import { genPayload, sendWebhook } from './discord.mjs'
 
 const POWER_CONTROL_LOCK_FILE = () => path.join(process.env.DATA_PATH, 'power_disabled.lock')
 
-export function isPowerControlDisabled() {
+function isPowerControlDisabled() {
   return fs.existsSync(POWER_CONTROL_LOCK_FILE())
 }
 
