@@ -2,7 +2,8 @@ import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import { checkPowerControl, disablePowerControl, enablePowerControl } from './flags.mjs'
-import { poweron, shutdown, standby } from './net.mjs'
+import { acquireLock, releaseLock } from './locks.mjs'
+import { poweron, standby } from './power.mjs'
 
 config()
 
@@ -28,13 +29,6 @@ const PORT = process.env.PORT || 3000
 
 app.use(morgan(':remote-addr - [:date[clf]] ":method :url" :status :total-time ms :res[content-length]'))
 
-// error handler
-// noinspection JSUnusedLocalSymbols
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
-})
-
 async function handle_signal(signal) {
   console.log(`Received ${ signal }. Exiting...`)
   process.exit(0)
@@ -43,45 +37,56 @@ async function handle_signal(signal) {
 process.on('SIGINT', handle_signal)
 process.on('SIGTERM', handle_signal)
 
-async function run_safe_proc(res, proc) {
-  try {
-    await proc()
-    res.send('OK')
-  } catch (err) {
-    console.error(err)
-    console.error(err.stack)
-    res.status(500).send(JSON.stringify(err.cause))
-  }
-}
-
 app.get('/ping', async (req, res) => {
   res.send('pong')
 })
 
-app.get('/poweron', async (req, res) => {
-  if (!await checkPowerControl(res, 'Power ON request received', 0x13B10B)) return
-  await run_safe_proc(res, async () => await poweron())
+app.get('/acquire', async (req, res) => {
+  if (!await checkPowerControl(res, 'Lock acquisition request received', 0x13B10B)) return
+
+  const acquired = await acquireLock('power', poweron)
+  if (!acquired) {
+    return res.status(409).send("You already acquired a lock for this resource")
+  }
+
+  return res.send('OK')
 })
 
-app.get('/standby', async (req, res) => {
-  if (!await checkPowerControl(res, 'Sleep request received', 0xCBA20C)) return
-  await run_safe_proc(res, async () => await standby())
+app.get('/release', async (req, res) => {
+  if (!await checkPowerControl(res, 'Lock release request received', 0xCBA20C)) return
+
+  const released = await releaseLock('power', standby)
+  if (!released) {
+    return res.status(409).send("You don't have any lock pending for this resource")
+  }
+
+  return res.send('OK')
 })
 
-app.get('/shutdown', async (req, res) => {
-  if (!await checkPowerControl(res, 'Shut down request received', 0xBA0808)) return
-  await run_safe_proc(res, async () => await shutdown())
-})
-
-app.get('/power/enable', async (req, res) => {
+app.get('/enable', async (req, res) => {
   enablePowerControl()
   res.send('Power control enabled')
 })
 
-app.get('/power/disable', async (req, res) => {
+app.get('/disable', async (req, res) => {
   disablePowerControl()
   res.send('Power control disabled')
 })
+
+// noinspection JSUnusedLocalSymbols
+/**
+ * Global error handler middleware
+ * @param err {Error} - The error that occurred
+ * @param req {express.Request} - The request object
+ * @param res {express.Response} - The response object
+ * @param next {Function} - The next middleware function
+ */
+function errorHandler(err, req, res, next) {
+  console.error(err)
+  console.error(err.stack)
+  res.status(500).send(JSON.stringify(err.cause))
+}
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${ PORT }`)
