@@ -1,51 +1,43 @@
 /**
- * Map containing lock count acquired for each key
- * @type {Map<string, number>}
+ * Array of user IDs that have acquired a lock
+ * @type {string[]}
  */
-const locks = new Map()
+const locks = []
 
 /**
- * Acquire a lock for a given key
- * @param key {string} - The key to acquire a lock for
+ * Acquire a lock for a given user
+ * @param sub {string} - The subject to acquire the lock for
  * @param onFirstLockAcquired {Function} - The function to call when the first lock is acquired
  * @returns {Promise<boolean>} - Whether the lock was acquired
  */
-export async function acquireLock(key, onFirstLockAcquired) {
-  if (!locks.has(key)) {
-    locks.set(key, 0)
+export async function acquireLock(sub, onFirstLockAcquired) {
+  if (locks.includes(sub)) {
+    return false
   }
 
-  const currentValue = locks.get(key)
-  if (currentValue === 0) {
+  if (locks.length === 0) {
     await onFirstLockAcquired()
   }
 
-  locks.set(key, currentValue + 1)
-  console.log(locks)
+  locks.push(sub)
   return true
 }
 
 /**
- * Release a lock for a given key
- * @param key {string} - The key to release a lock for
+ * Release a lock for a given user
+ * @param sub {string} - The subject to release the lock for
  * @param onAllLockReleased {Function} - The function to call when the last lock is being released
  * @returns {Promise<boolean>} - Whether the lock was released
  */
-export async function releaseLock(key, onAllLockReleased) {
-  if (!locks.has(key)) {
-    console.log(locks)
+export async function releaseLock(sub, onAllLockReleased) {
+  if (!locks.includes(sub)) {
     return false
   }
 
-  const currentValue = locks.get(key)
-  if (currentValue === 0) {
-    console.log(locks)
-    return false
-  } else if (currentValue === 1) {
+  if (locks.length === 1) {
     await onAllLockReleased()
   }
 
-  locks.set(key, currentValue - 1)
-  console.log(locks)
+  locks.splice(locks.findIndex(s => s === sub), 1)
   return true
 }

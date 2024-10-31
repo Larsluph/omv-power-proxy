@@ -1,6 +1,8 @@
 # omv-power-proxy
 
-This is a simple proxy for power management of an OpenMediaVault server. It is a simple web server that listens for HTTP requests and forwards them to the appropriate power management command.
+This is a proxy for power management of an OpenMediaVault server. It is a web server that listens for HTTP requests and forwards them to the appropriate power management command.
+
+It uses OIDC for authentication and authorization.
 
 ## Build
 

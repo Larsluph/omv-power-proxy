@@ -11,7 +11,7 @@ router.get('/acquire', async (req, res, next) => {
   let acquired
 
   try {
-    acquired = await acquireLock('power', poweron)
+    acquired = await acquireLock(req.user.sub, poweron)
   } catch (e) {
     return next(e)
   }
@@ -29,7 +29,7 @@ router.get('/release', async (req, res, next) => {
   let released
 
   try {
-    released = await releaseLock('power', standby)
+    released = await releaseLock(req.user.sub, standby)
   } catch (e) {
     return next(e)
   }
