@@ -22,7 +22,7 @@ function getRequestId(req) {
  * @param req {express.Request} - The request object
  */
 function getRedirectUri(req) {
-  const protocol = req.protocol
+  const protocol = req.headers['x-forwarded-proto'] ?? req.protocol
   const host = req.get('host')
   return `${ protocol }://${ host }/auth/callback`
 }
