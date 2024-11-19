@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
-import oidcMiddleware, { discoverOidcConfig } from './packages/oidc.mjs'
+import { discoverOidcConfig, requireLoggedIn, requireAdmin } from './packages/oidc.mjs'
 import locksRouter from './routers/lockManagement.mjs'
 import oidcRouter from './routers/oidc.mjs'
 import powerControlRouter from './routers/powerControl.mjs'
@@ -22,6 +22,7 @@ app.use(cookieParser())
     'OIDC_REDIRECT_URI',
     'OIDC_CLIENT_ID',
     'OIDC_CLIENT_SECRET',
+    'OIDC_ADMIN_GROUP',
   ]
 
   const missing = required.filter((key) => !process.env[key])
@@ -50,8 +51,8 @@ app.get('/ping', async (req, res) => {
   res.send('pong')
 })
 
-app.use('/lock', oidcMiddleware, locksRouter)
-app.use('/control', oidcMiddleware, powerControlRouter)
+app.use('/lock', requireLoggedIn, locksRouter)
+app.use('/control', requireLoggedIn, requireAdmin, powerControlRouter)
 app.use('/auth', oidcRouter)
 
 // noinspection JSUnusedLocalSymbols

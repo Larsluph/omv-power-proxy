@@ -32,7 +32,14 @@ async function getLoggedUser(cookies) {
     .catch(() => undefined)
 }
 
-export default async function oidcMiddleware(req, res, next) {
+/**
+ * Middleware to check if the user is logged in
+ * @param req {Request}
+ * @param res {Response}
+ * @param next {Function}
+ * @returns {Promise<*>}
+ */
+export async function requireLoggedIn(req, res, next) {
   const user = await getLoggedUser(req.cookies)
 
   if (!user) {
@@ -40,5 +47,22 @@ export default async function oidcMiddleware(req, res, next) {
   }
 
   req.user = user
+  next()
+}
+
+/**
+ * Middleware to check if the user is logged in
+ * @param req {Request}
+ * @param res {Response}
+ * @param next {Function}
+ * @returns {Promise<*>}
+ */
+export async function requireAdmin(req, res, next) {
+  const isAdmin = req.user?.groups?.includes(process.env.OIDC_ADMIN_GROUP)
+
+  if (!isAdmin) {
+    return res.status(403).send('Forbidden')
+  }
+
   next()
 }
