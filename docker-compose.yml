@@ -1,3 +1,12 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
 services:
   app:
     image: ghcr.io/larsluph/omv-power-proxy:latest
@@ -10,6 +19,15 @@ services:
       - OMV_USERNAME=${OMV_USERNAME}
       - OMV_PASSWORD=${OMV_PASSWORD}
       - WOL_MAC_ADDRESS=${WOL_MAC_ADDRESS}
+
+      - DISCORD_WEBHOOK_ID=${DISCORD_WEBHOOK_ID}
+      - DISCORD_WEBHOOK_TOKEN=${DISCORD_WEBHOOK_TOKEN}
+
+      - OIDC_ISSUER=${OIDC_ISSUER}
+      - OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_ADMIN_GROUP=${OIDC_ADMIN_GROUP}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
