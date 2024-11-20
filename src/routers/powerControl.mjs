@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { resetLocks } from '../packages/locks.mjs'
 import { disablePowerControl, enablePowerControl } from '../packages/powerControl.mjs'
 
 const router = Router()
@@ -11,6 +12,23 @@ router.get('/enable', async (req, res) => {
 router.get('/disable', async (req, res) => {
   disablePowerControl()
   res.send('Power control disabled')
+})
+
+router.get('/reset', async (req, res, next) => {
+  let locksReset
+  try {
+    locksReset = await resetLocks()
+  } catch (e) {
+    next(e)
+    return
+  }
+
+  if (!locksReset) {
+    res.send('No locks were reset')
+    return
+  }
+
+  res.send('Power control reset')
 })
 
 export default router

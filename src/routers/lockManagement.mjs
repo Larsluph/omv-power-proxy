@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { acquireLock, releaseLock } from '../packages/locks.mjs'
-import { poweron, standby } from '../packages/omv.mjs'
 import { checkPowerControl } from '../packages/powerControl.mjs'
 
 const router = Router()
@@ -11,7 +10,7 @@ router.get('/acquire', async (req, res, next) => {
   let acquired
 
   try {
-    acquired = await acquireLock(req.user.sub, poweron)
+    acquired = await acquireLock(req.user.sub)
   } catch (e) {
     return next(e)
   }
@@ -29,7 +28,7 @@ router.get('/release', async (req, res, next) => {
   let released
 
   try {
-    released = await releaseLock(req.user.sub, standby)
+    released = await releaseLock(req.user.sub)
   } catch (e) {
     return next(e)
   }
