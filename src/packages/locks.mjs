@@ -7,6 +7,14 @@ import { poweron, standby } from './omv.mjs'
 const locks = []
 
 /**
+ * Retrieve all locks
+ * @returns {string[]}
+ */
+export function getLocks() {
+  return locks
+}
+
+/**
  * Acquire a lock for a given user
  * @param sub {string} - The subject to acquire the lock for
  * @returns {Promise<boolean>} - Whether the lock was acquired

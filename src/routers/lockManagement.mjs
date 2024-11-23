@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { acquireLock, releaseLock } from '../packages/locks.mjs'
-import { isAdminUser } from '../packages/oidc.mjs'
+import { acquireLock, getLocks, releaseLock } from '../packages/locks.mjs'
+import { isAdminUser, requireAdmin } from '../packages/oidc.mjs'
 import { checkPowerControl } from '../packages/powerControl.mjs'
 
 const router = Router()
@@ -37,6 +37,10 @@ router.get('/release', async (req, res, next) => {
   }
 
   return res.send('OK')
+})
+
+router.get('/status', requireAdmin, async (req, res, next) => {
+  res.status(200).json(getLocks())
 })
 
 export default router
