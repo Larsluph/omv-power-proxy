@@ -23,8 +23,6 @@ router.get('/acquire', async (req, res, next) => {
 })
 
 router.get('/release', async (req, res, next) => {
-  if (!await checkPowerControl(res, 'Lock release request received', 0xCBA20C)) return
-
   let released
 
   try {
