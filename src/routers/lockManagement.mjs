@@ -1,11 +1,12 @@
 import { Router } from 'express'
 import { acquireLock, releaseLock } from '../packages/locks.mjs'
+import { isAdminUser } from '../packages/oidc.mjs'
 import { checkPowerControl } from '../packages/powerControl.mjs'
 
 const router = Router()
 
 router.get('/acquire', async (req, res, next) => {
-  if (!await checkPowerControl(res, 'Lock acquisition request received', 0x13B10B)) return
+  if (!isAdminUser(req.user) && !await checkPowerControl(res, 'Lock acquisition request received', 0x13B10B)) return
 
   let acquired
 

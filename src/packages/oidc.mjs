@@ -33,17 +33,27 @@ async function getLoggedUser(cookies) {
 }
 
 /**
+ * Check if the user is an admin
+ * @param user {client.oauth.UserInfoResponse}
+ * @returns {boolean}
+ */
+export function isAdminUser(user) {
+  return user.groups?.includes(process.env.OIDC_ADMIN_GROUP) ?? false
+}
+
+/**
  * Middleware to check if the user is logged in
- * @param req {Request}
- * @param res {Response}
- * @param next {Function}
- * @returns {Promise<*>}
+ * @param req {import('express').Request}
+ * @param res {import('express').Response}
+ * @param next {import('express').NextFunction}
+ * @returns {Promise<void>}
  */
 export async function requireLoggedIn(req, res, next) {
   const user = await getLoggedUser(req.cookies)
 
   if (!user) {
-    return res.redirect('/auth/login?redirect=' + req.originalUrl)
+    res.redirect('/auth/login?redirect=' + req.originalUrl)
+    return
   }
 
   req.user = user
@@ -52,16 +62,17 @@ export async function requireLoggedIn(req, res, next) {
 
 /**
  * Middleware to check if the user is logged in
- * @param req {Request}
- * @param res {Response}
- * @param next {Function}
- * @returns {Promise<*>}
+ * @param req {import('express').Request}
+ * @param res {import('express').Response}
+ * @param next {import('express').NextFunction}
+ * @returns {Promise<void>}
  */
 export async function requireAdmin(req, res, next) {
-  const isAdmin = req.user?.groups?.includes(process.env.OIDC_ADMIN_GROUP)
+  const isAdmin = !!req.user && isAdminUser(req.user)
 
   if (!isAdmin) {
-    return res.status(403).send('Forbidden')
+    res.status(403).send('Forbidden')
+    return
   }
 
   next()
