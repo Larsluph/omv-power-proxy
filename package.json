@@ -10,7 +10,7 @@
     "axios-cookiejar-support": "^5.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "morgan": "^1.10.0",
     "openid-client": "^6.1.7",
     "tough-cookie": "^5.0.0",
