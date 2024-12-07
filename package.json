@@ -1,6 +1,6 @@
 {
   "name": "omv-power-proxy",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "private": true,
   "scripts": {
     "start": "nodemon -w .env -w src/* src/main.mjs"
