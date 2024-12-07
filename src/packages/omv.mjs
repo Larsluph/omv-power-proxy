@@ -1,10 +1,8 @@
-import axios from 'axios'
-import { wrapper } from 'axios-cookiejar-support'
-import { CookieJar } from 'tough-cookie'
 import wake from 'wakeonlan'
+import FetchWithCookies from './http.mjs'
 
-function createClient() {
-  return wrapper(axios.create({ baseURL: process.env.OMV_BASE_URL, jar: new CookieJar() }))
+function createClient(options) {
+  return new FetchWithCookies(options)
 }
 
 export async function poweron() {
@@ -16,39 +14,37 @@ export async function poweron() {
   })
 }
 
-export async function login() {
-  const client = createClient()
-
+/**
+ * @param client {FetchWithCookies}
+ */
+export async function login(client) {
   const { OMV_USERNAME, OMV_PASSWORD } = process.env
 
-  await client.post('/rpc.php', {
-    service: 'Session',
-    method: 'login',
-    params: { username: OMV_USERNAME, password: OMV_PASSWORD },
-    options: null
+  return await client.fetch('/rpc.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service: 'Session',
+      method: 'login',
+      params: { username: OMV_USERNAME, password: OMV_PASSWORD },
+      options: null
+    })
   })
-
-  return client
 }
 
 export async function standby() {
-  const client = await login()
+  const client = createClient({ baseUrl: process.env.OMV_BASE_URL })
 
-  await client.post('/rpc.php', {
-    service: 'System',
-    method: 'standby',
-    params: { delay: 1 },
-    options: null
-  })
-}
+  await login(client)
 
-export async function shutdown() {
-  const client = await login()
-
-  await client.post('/rpc.php', {
-    service: 'System',
-    method: 'shutdown',
-    params: { delay: 1 },
-    options: null
+  return await client.fetch('/rpc.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service: 'System',
+      method: 'standby',
+      params: { delay: 1 },
+      options: null
+    })
   })
 }
