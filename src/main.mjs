@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
-import { discoverOidcConfig, requireLoggedIn, requireAdmin } from './packages/oidc.mjs'
+import { config as oidcConfig, discoverOidcConfig, requireLoggedIn, requireAdmin } from './packages/oidc.mjs'
 import locksRouter from './routers/lockManagement.mjs'
 import oidcRouter from './routers/oidc.mjs'
 import powerControlRouter from './routers/powerControl.mjs'
@@ -10,6 +10,13 @@ import powerControlRouter from './routers/powerControl.mjs'
 config()
 
 const app = express()
+app.use((_, res, next) => {
+  if (!oidcConfig) {
+    res.send('Initialization not complete')
+    return
+  }
+  next()
+})
 app.use(cookieParser())
 
 ;(function require_env() {
