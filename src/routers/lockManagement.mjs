@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { genPayload, sendWebhook } from '../packages/discord.mjs'
 import { acquireLock, getLocks, releaseLock } from '../packages/locks.mjs'
 import { isAdminUser, requireAdmin } from '../packages/oidc.mjs'
 import { checkPowerControl } from '../packages/powerControl.mjs'
@@ -13,14 +14,18 @@ router.get('/acquire', async (req, res, next) => {
   try {
     acquired = await acquireLock(req.user.sub)
   } catch (e) {
-    return next(e)
+    next(e)
+    return
   }
 
   if (!acquired) {
-    return res.status(409).send("You already acquired a lock for this resource")
+    res.status(409).send("You already acquired a lock for this resource")
+    return
   }
 
-  return res.send('OK')
+  await sendWebhook(genPayload(`Lock acquired by "${req.user.preferred_username}"`, 0x13B10B))
+
+  res.send('OK')
 })
 
 router.get('/release', async (req, res, next) => {
@@ -29,14 +34,18 @@ router.get('/release', async (req, res, next) => {
   try {
     released = await releaseLock(req.user.sub)
   } catch (e) {
-    return next(e)
+    next(e)
+    return
   }
 
   if (!released) {
-    return res.status(409).send("You don't have any lock pending for this resource")
+    res.status(409).send("You don't have any lock pending for this resource")
+    return
   }
 
-  return res.send('OK')
+  await sendWebhook(genPayload(`Lock released by "${req.user.preferred_username}"`, 0xCBA20C))
+
+  res.send('OK')
 })
 
 router.get('/status', requireAdmin, async (req, res, next) => {
