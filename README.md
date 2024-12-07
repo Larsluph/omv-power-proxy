@@ -6,13 +6,4 @@ It uses OIDC for authentication and authorization.
 
 ## Build
 
-To build the project, run the following command:
-
-```bash
-# Login to GitHub Container Registry
-docker login ghcr.io -u larsluph
-# Build image with tags
-docker build -t ghcr.io/larsluph/omv-power-proxy:latest -t ghcr.io/larsluph/omv-power-proxy:$VERSION .
-# Push image to registry
-docker push ghcr.io/larsluph/omv-power-proxy -a
-```
+To build the project, refer to the [Docker README](README.Docker.md).

@@ -3,7 +3,7 @@
 When you're ready, start your application by running:
 ```shell
 # Set new version in current context
-$VERSION="X.Y.Z"
+$VERSION=Read-Host "Enter version to create (X.Y.Z): "
 # Bump package version
 npm version $VERSION --no-commit-hooks --no-git-tag-version
 # Login to GitHub Container Registry
