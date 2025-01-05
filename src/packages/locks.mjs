@@ -1,17 +1,49 @@
+import fs from 'fs'
+import path from 'path'
 import { poweron, standby } from './omv.mjs'
 
 /**
- * Array of user IDs that have acquired a lock
- * @type {string[]}
+ * Check if a lock exists for a given user
+ * @param sub {string} - The subject to check the lock for
+ * @returns {boolean} - Whether the lock exists for the user
  */
-const locks = []
+function getUserLock(sub) {
+  return fs.existsSync(path.join(process.env.DATA_PATH, `${sub}.lock`))
+}
+
+/**
+ * Create a lock for a given user
+ * @param sub {string} - The subject to create the lock for
+ */
+function createLock(sub) {
+  fs.writeFileSync(path.join(process.env.DATA_PATH, `${sub}.lock`), '')
+}
+
+/**
+ * Delete a lock for a given user
+ * @param sub {string} - The subject to delete the lock for
+ */
+function deleteLock(sub) {
+  fs.unlinkSync(path.join(process.env.DATA_PATH, `${sub}.lock`))
+}
+
+/**
+ * Clear all locks
+ */
+function clearLocks() {
+  fs.readdirSync(process.env.DATA_PATH)
+    .filter(file => file.endsWith('.lock'))
+    .forEach(file => fs.unlinkSync(path.join(process.env.DATA_PATH, file)))
+}
 
 /**
  * Retrieve all locks
  * @returns {string[]}
  */
 export function getLocks() {
-  return locks
+  return fs.readdirSync(process.env.DATA_PATH)
+    .filter(file => file.endsWith('.lock'))
+    .map(file => file.replace('.lock', ''))
 }
 
 /**
@@ -20,15 +52,15 @@ export function getLocks() {
  * @returns {Promise<boolean>} - Whether the lock was acquired
  */
 export async function acquireLock(sub) {
-  if (locks.includes(sub)) {
+  if (getUserLock(sub)) {
     return false
   }
 
-  if (locks.length === 0) {
+  if (getLocks().length === 0) {
     await poweron()
   }
 
-  locks.push(sub)
+  createLock(sub)
   return true
 }
 
@@ -38,15 +70,15 @@ export async function acquireLock(sub) {
  * @returns {Promise<boolean>} - Whether the lock was released
  */
 export async function releaseLock(sub) {
-  if (!locks.includes(sub)) {
+  if (!getUserLock(sub)) {
     return false
   }
 
-  if (locks.length === 1) {
+  if (getLocks().length === 1) {
     await standby()
   }
 
-  locks.splice(locks.findIndex(s => s === sub), 1)
+  deleteLock(sub)
   return true
 }
 
@@ -55,11 +87,11 @@ export async function releaseLock(sub) {
  * @returns {Promise<boolean>} - Whether locks were reset
  */
 export async function resetLocks() {
-  if (locks.length === 0) {
+  if (getLocks().length === 0) {
     return false
   }
 
   await standby()
-  locks.splice(0, locks.length)
+  clearLocks()
   return true
 }
