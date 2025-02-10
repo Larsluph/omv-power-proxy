@@ -11,7 +11,7 @@
     "express": "^4.21.2",
     "morgan": "^1.10.0",
     "openid-client": "^6.1.7",
-    "tough-cookie": "^5.1.0",
+    "tough-cookie": "^5.1.1",
     "wakeonlan": "^0.1.0"
   },
   "devDependencies": {
