@@ -1,6 +1,5 @@
-### Building and running your application
+### Building the application
 
-When you're ready, start your application by running:
 ```shell
 # Set new version in current context
 $VERSION=Read-Host "Enter version to create (X.Y.Z): "
@@ -20,8 +19,6 @@ git tag $VERSION
 git push origin
 git push origin tag $VERSION
 ```
-
-Your application will be available at http://localhost:3000.
 
 ### References
 * [Docker's Node.js guide](https://docs.docker.com/language/nodejs/)
