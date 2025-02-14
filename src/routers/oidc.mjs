@@ -54,8 +54,6 @@ router.get('/login', async (req, res) => {
   res.redirect(redirectTo.href)
 })
 
-// one eternity later, the user lands back on the redirect_uri
-// Authorization Code Grant
 router.get('/callback', async (req, res) => {
   const parameters = pendingRequests.get(getRequestId(req))
 
@@ -69,7 +67,6 @@ router.get('/callback', async (req, res) => {
   })
 
   const claims = tokens.claims()
-  console.log(claims, new Date(claims.exp))
 
   /** @type {express.CookieOptions} */
   const cookieOptions = {
