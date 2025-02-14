@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import express from 'express'
+import { rateLimit } from 'express-rate-limit'
 import morgan from 'morgan'
 import { config as oidcConfig, discoverOidcConfig, requireLoggedIn, requireAdmin } from './packages/oidc.mjs'
 import locksRouter from './routers/lockManagement.mjs'
@@ -60,7 +61,7 @@ app.get('/ping', async (req, res) => {
 
 app.use('/lock', requireLoggedIn, locksRouter)
 app.use('/control', requireLoggedIn, requireAdmin, powerControlRouter)
-app.use('/auth', oidcRouter)
+app.use('/auth', rateLimit(), oidcRouter)
 
 // noinspection JSUnusedLocalSymbols
 /**
