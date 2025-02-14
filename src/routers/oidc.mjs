@@ -35,7 +35,21 @@ function getCurrentUrl(req) {
   return new URL(`${ getRedirectUri(req) }?code=${ req.query.code }`)
 }
 
+/**
+ * Checks whether the URL is a valid redirect URL
+ * @param req {express.Request} - The request object
+ * @param url {string} - The URL to check
+ */
+function isValidRedirectUrl(req, url) {
+  const baseUrl = `${ req.protocol }://${ req.get('host') }`
+  return new URL(url, baseUrl).origin === baseUrl
+}
+
 router.get('/login', async (req, res) => {
+  if (!isValidRedirectUrl(req, req.query.redirect)) {
+    return res.status(400).send('Invalid redirect URL')
+  }
+
   const code_verifier = client.randomPKCECodeVerifier()
   const code_challenge = await client.calculatePKCECodeChallenge(code_verifier)
 
