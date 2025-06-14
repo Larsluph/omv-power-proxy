@@ -30,16 +30,6 @@ jobs:
       - name: Bump node package version
         run: npm version ${{ inputs.version }} --no-commit-hooks --no-git-tag-version
 
-      - name: Create commit and tag
-        uses: stefanzweifel/git-auto-commit-action@v6
-        with:
-          commit_message: "${{ inputs.version }} Release"
-          tagging_message: "${{ inputs.version }}"
-          status_options: '--untracked-files=no'
-
-      - name: Update latest tag
-        uses: EndBug/latest-tag@v1
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -72,3 +62,13 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Create commit and tag
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "${{ inputs.version }} Release"
+          tagging_message: "${{ inputs.version }}"
+          status_options: '--untracked-files=no'
+
+      - name: Update latest tag
+        uses: EndBug/latest-tag@v1
