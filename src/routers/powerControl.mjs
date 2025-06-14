@@ -28,6 +28,8 @@ router.get('/reset', async (req, res, next) => {
     return
   }
 
+  await sendWebhook(genPayload(`Lock reset triggered by "${req.user.preferred_username}"`, 0xF68F2C))
+
   res.send('Power control reset')
 })
 
