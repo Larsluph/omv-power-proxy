@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { genPayload, sendWebhook } from '../packages/discord.mjs'
 import { resetLocks } from '../packages/locks.mjs'
 import { disablePowerControl, enablePowerControl } from '../packages/powerControl.mjs'
 
