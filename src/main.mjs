@@ -11,6 +11,10 @@ import powerControlRouter from './routers/powerControl.mjs'
 config()
 
 const app = express()
+
+app.set('trust proxy', 1 /* number of proxies between user and server */)
+app.use('/auth', rateLimit(), oidcRouter)
+
 app.use((_, res, next) => {
   if (!oidcConfig) {
     res.send('Initialization not complete')
@@ -61,7 +65,6 @@ app.get('/ping', async (req, res) => {
 
 app.use('/lock', requireLoggedIn, locksRouter)
 app.use('/control', requireLoggedIn, requireAdmin, powerControlRouter)
-app.use('/auth', rateLimit(), oidcRouter)
 
 // noinspection JSUnusedLocalSymbols
 /**
