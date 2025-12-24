@@ -16,7 +16,7 @@ export function genPayload(title, color) {
  * @returns {Promise<void>}
  */
 export async function sendWebhook(payload) {
-  const { DISCORD_WEBHOOK_ID, DISCORD_WEBHOOK_TOKEN } = process.env
+  const { DISCORD_WEBHOOK_ID, DISCORD_WEBHOOK_TOKEN, DISCORD_WEBHOOK_THREAD_ID } = process.env
   if (!DISCORD_WEBHOOK_ID || !DISCORD_WEBHOOK_TOKEN) {
     const { title, timestamp } = payload.embeds[0]
     console.log(`[${timestamp}] ${title}`)
@@ -24,6 +24,10 @@ export async function sendWebhook(payload) {
   }
 
   const url = `https://discord.com/api/webhooks/${ DISCORD_WEBHOOK_ID }/${ DISCORD_WEBHOOK_TOKEN }?wait=true`
+
+  if (DISCORD_WEBHOOK_THREAD_ID) {
+    url += `&thread_id=${DISCORD_WEBHOOK_THREAD_ID}`
+  }
 
   try {
     await fetch(url, {
