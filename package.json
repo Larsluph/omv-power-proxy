@@ -9,7 +9,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.2.2",
+    "express-rate-limit": "^8.3.1",
     "morgan": "^1.10.1",
     "openid-client": "^6.8.2",
     "tough-cookie": "^6.0.0",
