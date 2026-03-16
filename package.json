@@ -12,7 +12,7 @@
     "express-rate-limit": "^8.3.1",
     "morgan": "^1.10.1",
     "openid-client": "^6.8.2",
-    "tough-cookie": "^6.0.0",
+    "tough-cookie": "^6.0.1",
     "wakeonlan": "^0.1.0"
   },
   "devDependencies": {
