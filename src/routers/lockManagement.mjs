@@ -29,10 +29,11 @@ router.get('/acquire', async (req, res, next) => {
 })
 
 router.get('/release', async (req, res, next) => {
+  const skip = req.query.skip !== undefined
   let released
 
   try {
-    released = await releaseLock(req.user.sub)
+    released = await releaseLock(req.user.sub, skip)
   } catch (e) {
     next(e)
     return

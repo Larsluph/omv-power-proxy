@@ -10,7 +10,7 @@ const pendingRequests = new Map()
 
 /**
  * Get the request ID
- * @param req {express.Request} - The request object
+ * @param req {express.Request} The request object
  */
 function getRequestId(req) {
   const requestId = `${req.ip}:${req.headers['user-agent']}`
@@ -19,7 +19,7 @@ function getRequestId(req) {
 
 /**
  * Get the redirect URI
- * @param req {express.Request} - The request object
+ * @param req {express.Request} The request object
  */
 function getRedirectUri(req) {
   const protocol = req.headers['x-forwarded-proto'] ?? req.protocol
@@ -29,7 +29,7 @@ function getRedirectUri(req) {
 
 /**
  * Get the current URL
- * @param req {express.Request} - The request object
+ * @param req {express.Request} The request object
  */
 function getCurrentUrl(req) {
   return new URL(`${ getRedirectUri(req) }?code=${ req.query.code }`)
@@ -37,8 +37,8 @@ function getCurrentUrl(req) {
 
 /**
  * Checks whether the URL is a valid redirect URL
- * @param req {express.Request} - The request object
- * @param url {string} - The URL to check
+ * @param req {express.Request} The request object
+ * @param url {string} The URL to check
  */
 function isValidRedirectUrl(req, url) {
   const baseUrl = `${ req.protocol }://${ req.get('host') }`

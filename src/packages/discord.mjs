@@ -2,9 +2,9 @@
 
 /**
  * Generates a Discord payload valid for a webhook
- * @param title {string} - Webhook message title
- * @param color {number} - Webhook message color (hex)
- * @returns Payload - The generated payload
+ * @param title {string} Webhook message title
+ * @param color {number} Webhook message color (hex)
+ * @returns Payload The generated payload
  */
 export function genPayload(title, color) {
   return { embeds: [{ title, color, timestamp: new Date().toISOString() }] }
@@ -12,7 +12,7 @@ export function genPayload(title, color) {
 
 /**
  * Sends a payload to the configured Discord webhook
- * @param payload {Payload} - The payload to send
+ * @param payload {Payload} The payload to send
  * @returns {Promise<void>}
  */
 export async function sendWebhook(payload) {

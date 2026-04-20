@@ -69,10 +69,10 @@ app.use('/control', requireLoggedIn, requireAdmin, powerControlRouter)
 // noinspection JSUnusedLocalSymbols
 /**
  * Global error handler middleware
- * @param err {Error} - The error that occurred
- * @param req {import('express').Request} - The request object
- * @param res {import('express').Response} - The response object
- * @param next {Function} - The next middleware function
+ * @param err {Error} The error that occurred
+ * @param req {import('express').Request} The request object
+ * @param res {import('express').Response} The response object
+ * @param next {Function} The next middleware function
  */
 function errorHandler(err, req, res, next) {
   console.error(err)

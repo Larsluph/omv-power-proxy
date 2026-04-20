@@ -19,7 +19,7 @@ export async function discoverOidcConfig() {
 
 /**
  * Get the logged user from the cookies
- * @param cookies {Record<string, string>} - The request object
+ * @param cookies {Record<string, string>} The request object
  * @returns The logged user if found, undefined otherwise
  */
 async function getLoggedUser(cookies) {

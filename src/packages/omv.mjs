@@ -16,26 +16,44 @@ export async function poweron() {
 
 /**
  * @param client {FetchWithCookies}
+ * @returns {Promise<boolean>} true on success, false if unreachable (down) or throw on uncaught
  */
 export async function login(client) {
   const { OMV_USERNAME, OMV_PASSWORD } = process.env
 
-  return await client.fetch('/rpc.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      service: 'Session',
-      method: 'login',
-      params: { username: OMV_USERNAME, password: OMV_PASSWORD },
-      options: null
+  try {
+    await client.fetch('/rpc.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service: 'Session',
+        method: 'login',
+        params: { username: OMV_USERNAME, password: OMV_PASSWORD },
+        options: null
+      })
     })
-  })
+  } catch (error) {
+    if (error.cause?.code === 'EHOSTUNREACH') {
+      console.error('OMV host is unreachable:', error.cause.address)
+      return false
+    }
+    throw error
+  }
+
+  return true
 }
 
-export async function standby() {
+/**
+ * @param skip {boolean} If true, silently skip on errors; if false, throw errors
+ */
+export async function standby(skip = false) {
   const client = createClient({ baseUrl: process.env.OMV_BASE_URL })
 
-  await login(client)
+  const loginResult = await login(client)
+  if (!loginResult && skip) {
+    console.log('Skipping standby: OMV host is unreachable')
+    return null
+  }
 
   return await client.fetch('/rpc.php', {
     method: 'POST',

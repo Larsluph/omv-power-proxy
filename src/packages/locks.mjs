@@ -4,8 +4,8 @@ import { poweron, standby } from './omv.mjs'
 
 /**
  * Check if a lock exists for a given user
- * @param sub {string} - The subject to check the lock for
- * @returns {boolean} - Whether the lock exists for the user
+ * @param sub {string} The subject to check the lock for
+ * @returns {boolean} Whether the lock exists for the user
  */
 function getUserLock(sub) {
   return fs.existsSync(path.join(process.env.DATA_PATH, `${sub}.lock`))
@@ -13,7 +13,7 @@ function getUserLock(sub) {
 
 /**
  * Create a lock for a given user
- * @param sub {string} - The subject to create the lock for
+ * @param sub {string} The subject to create the lock for
  */
 function createLock(sub) {
   fs.writeFileSync(path.join(process.env.DATA_PATH, `${sub}.lock`), '')
@@ -21,7 +21,7 @@ function createLock(sub) {
 
 /**
  * Delete a lock for a given user
- * @param sub {string} - The subject to delete the lock for
+ * @param sub {string} The subject to delete the lock for
  */
 function deleteLock(sub) {
   fs.unlinkSync(path.join(process.env.DATA_PATH, `${sub}.lock`))
@@ -48,8 +48,8 @@ export function getLocks() {
 
 /**
  * Acquire a lock for a given user
- * @param sub {string} - The subject to acquire the lock for
- * @returns {Promise<boolean>} - Whether the lock was acquired
+ * @param sub {string} The subject to acquire the lock for
+ * @returns {Promise<boolean>} Whether the lock was acquired
  */
 export async function acquireLock(sub) {
   if (getUserLock(sub)) {
@@ -66,16 +66,17 @@ export async function acquireLock(sub) {
 
 /**
  * Release a lock for a given user
- * @param sub {string} - The subject to release the lock for
- * @returns {Promise<boolean>} - Whether the lock was released
+ * @param sub {string} The subject to release the lock for
+ * @param skip {boolean} If true, silently skip on errors; if false, throw errors
+ * @returns {Promise<boolean>} Whether the lock was released
  */
-export async function releaseLock(sub) {
+export async function releaseLock(sub, skip = false) {
   if (!getUserLock(sub)) {
     return false
   }
 
   if (getLocks().length === 1) {
-    await standby()
+    await standby(skip)
   }
 
   deleteLock(sub)
@@ -84,14 +85,15 @@ export async function releaseLock(sub) {
 
 /**
  * Reset all locks
- * @returns {Promise<boolean>} - Whether locks were reset
+ * @param skip {boolean} If true, silently skip on errors; if false, throw errors
+ * @returns {Promise<boolean>} Whether locks were reset
  */
-export async function resetLocks() {
+export async function resetLocks(skip = false) {
   if (getLocks().length === 0) {
     return false
   }
 
-  await standby()
+  await standby(skip)
   clearLocks()
   return true
 }
