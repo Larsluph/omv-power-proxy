@@ -23,7 +23,7 @@ export async function sendWebhook(payload) {
     return
   }
 
-  const url = `https://discord.com/api/webhooks/${ DISCORD_WEBHOOK_ID }/${ DISCORD_WEBHOOK_TOKEN }?wait=true`
+  let url = `https://discord.com/api/webhooks/${ DISCORD_WEBHOOK_ID }/${ DISCORD_WEBHOOK_TOKEN }?wait=true`
 
   if (DISCORD_WEBHOOK_THREAD_ID) {
     url += `&thread_id=${DISCORD_WEBHOOK_THREAD_ID}`
