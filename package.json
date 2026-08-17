@@ -11,7 +11,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.1",
     "morgan": "^1.11.0",
-    "openid-client": "^6.8.4",
+    "openid-client": "^6.8.5",
     "tough-cookie": "^6.0.2",
     "wakeonlan": "^0.1.0"
   },
